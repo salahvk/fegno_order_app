@@ -6,7 +6,7 @@ abstract class ProductBlocState {}
 class ProductBlocInitial extends ProductBlocState {}
 
 class ProductBlocLoaded extends ProductBlocState {
-  final CartItem cartItem;
+  final List<CartItem> cartItem;
 
   ProductBlocLoaded(this.cartItem);
 }
