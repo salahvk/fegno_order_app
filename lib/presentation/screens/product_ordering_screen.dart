@@ -1,70 +1,122 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fegno_order_app/data/db/mycart.dart';
+import 'package:fegno_order_app/domain/entities/cart_item.dart';
+import 'package:fegno_order_app/presentation/bloc/bloc/product_bloc.dart';
 import 'package:fegno_order_app/presentation/widgets/custom_chatbubble.dart';
 import 'package:fegno_order_app/utilis/color_manager.dart';
 import 'package:fegno_order_app/utilis/style_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
-class ProductOrderingPage extends StatelessWidget {
+class ProductOrderingPage extends StatefulWidget {
   const ProductOrderingPage({super.key});
 
   @override
+  State<ProductOrderingPage> createState() => _ProductOrderingPageState();
+}
+
+class _ProductOrderingPageState extends State<ProductOrderingPage> {
+  final ProductBloc productBloc = ProductBloc();
+  var cartList = GetIt.I<MyCartList>().myList;
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Product Ordering'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          CustomChatBubble(isSendByServer: false, widget: [
-            Row(
+    print(cartList);
+    return BlocConsumer<ProductBloc, ProductState>(
+      bloc: productBloc,
+      listener: (context, state) {},
+      builder: (context, state) {
+        print(state);
+        if (state is ProductBlocInitial) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Product Ordering'),
+            ),
+            body: ListView(
+              padding: const EdgeInsets.all(16),
               children: [
-                Text(
-                  "Cart",
-                  style: getSemiBoldStyle(
-                      color: ColorManager.mainTextColor, fontSize: 16),
-                ),
+                CustomChatBubble(isSendByServer: false, widget: [
+                  Row(
+                    children: [
+                      Text(
+                        "Cart",
+                        style: getSemiBoldStyle(
+                            color: ColorManager.mainTextColor, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(color: Colors.grey, height: 2, thickness: 1),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Grand Total',
+                          style: getRegularStyle(
+                              color: ColorManager.mainTextColor, fontSize: 16)),
+                      Text(
+                          '\$21.98', // Replace this with the actual calculated grand total
+                          style: getSemiBoldStyle(
+                              color: ColorManager.mainTextColor, fontSize: 16)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _buildChangeInfoRow(),
+                  const SizedBox(height: 20),
+                  cartList.isNotEmpty
+                      ? ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return _buildCartItemRow(
+                              cartItem: cartList[index],
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(
+                              height: 8,
+                            );
+                          },
+                          itemCount: cartList.length,
+                        )
+                      : Container(),
+                  const SizedBox(height: 20),
+                  const Divider(color: Colors.grey, height: 2, thickness: 1),
+                  const SizedBox(height: 10),
+                  _buildAddMoreItemsRow(),
+                ]),
+                CustomChatBubble(isSendByServer: true, widget: [
+                  ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return const Divider();
+                    },
+                    itemCount: state.cartItem?.length ?? 0,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          productBloc.add(AddItemEvent(state.cartItem![index]));
+                        },
+                        child: Text(
+                          state.cartItem?[index].itemName ?? '',
+                          textAlign: TextAlign.center,
+                          style: getRegularStyle(
+                              color: ColorManager.mainTextColor, fontSize: 14),
+                        ),
+                      );
+                    },
+                  )
+                ]),
+                const CustomChatBubble(
+                    isSendByServer: true,
+                    widget: [Text("Add product Worth 15 to available coupen")])
               ],
             ),
-            const SizedBox(height: 10),
-            const Divider(color: Colors.grey, height: 2, thickness: 1),
-            const SizedBox(height: 10),
-            _buildGrandTotalRow(),
-            const SizedBox(height: 20),
-            _buildChangeInfoRow(),
-            const SizedBox(height: 20),
-            _buildCartItemRow(
-              imageUrl:
-                  'https://images.moneycontrol.com/static-mcnews/2022/04/fish.jpg?impolicy=website&width=1600&height=900',
-              productName: 'Product 1',
-              price: 10.99,
-              unit: 'pieces',
-              itemCount: 2,
-            ),
-            const SizedBox(height: 20),
-            const Divider(color: Colors.grey, height: 2, thickness: 1),
-            const SizedBox(height: 10),
-            _buildAddMoreItemsRow(),
-          ]),
-          const CustomChatBubble(
-              isSendByServer: true,
-              widget: [Text("Add product Worth 15 to available coupen")])
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGrandTotalRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('Grand Total',
-            style: getRegularStyle(
-                color: ColorManager.mainTextColor, fontSize: 16)),
-        Text('\$21.98', // Replace this with the actual calculated grand total
-            style: getSemiBoldStyle(
-                color: ColorManager.mainTextColor, fontSize: 16)),
-      ],
+          );
+        }
+        return Container();
+      },
     );
   }
 
@@ -78,18 +130,14 @@ class ProductOrderingPage extends StatelessWidget {
   }
 
   Widget _buildCartItemRow({
-    required String imageUrl,
-    required String productName,
-    required double price,
-    required String unit,
-    required int itemCount,
+    required CartItemModel cartItem,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipOval(
           child: CachedNetworkImage(
-            imageUrl: imageUrl,
+            imageUrl: cartItem.imageUrl,
             fit: BoxFit.cover,
             height: 50,
             width: 50,
@@ -101,44 +149,40 @@ class ProductOrderingPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                productName,
+                cartItem.itemName,
                 style:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 5),
               Text(
-                '\$$price per $unit',
+                '\$${cartItem.price} per ${cartItem.quantityUnit}',
                 style: getRegularStyle(color: ColorManager.green, fontSize: 14),
               ),
             ],
           ),
         ),
-        _buildQuantityControl(itemCount),
-      ],
-    );
-  }
-
-  Widget _buildQuantityControl(int itemCount) {
-    return Row(
-      children: [
-        IconButton(
-          onPressed: () {
-            // Handle decrement button press
-          },
-          icon: const Icon(Icons.remove),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          itemCount.toString(),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(width: 5),
-        IconButton(
-          onPressed: () {
-            // Handle increment button press
-          },
-          icon: const Icon(Icons.add),
-        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                productBloc.add(DecrementQuantityEvent(cartItem));
+              },
+              icon: const Icon(Icons.remove),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              cartItem.quantity.toString(),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 5),
+            IconButton(
+              onPressed: () {
+                productBloc.add(IncrementQuantityEvent(cartItem));
+              },
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        )
       ],
     );
   }

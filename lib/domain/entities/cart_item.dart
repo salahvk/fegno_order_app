@@ -1,11 +1,11 @@
-class CartItem {
+class CartItemModel {
   final String itemName;
   final double price;
-  final int quantity;
+  int quantity;
   final String quantityUnit;
   final String imageUrl;
 
-  CartItem({
+  CartItemModel({
     required this.itemName,
     required this.price,
     required this.quantity,
@@ -13,8 +13,8 @@ class CartItem {
     required this.imageUrl,
   });
 
-  factory CartItem.fromJson(Map<String, dynamic> json) {
-    return CartItem(
+  factory CartItemModel.fromJson(Map<String, dynamic> json) {
+    return CartItemModel(
       itemName: json['itemName'],
       price: json['price'].toDouble(),
       quantity: json['quantity'],
