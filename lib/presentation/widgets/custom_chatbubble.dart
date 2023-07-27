@@ -1,4 +1,4 @@
-import 'package:fegno_order_app/utilis/color_manager.dart';
+import 'package:fegno_order_app/utilis/manager/color_manager.dart';
 import 'package:flutter/material.dart';
 
 class CustomChatBubble extends StatelessWidget {

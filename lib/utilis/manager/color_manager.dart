@@ -10,8 +10,5 @@ class ColorManager {
   static Color subTextColor = const Color(0xff000000).withOpacity(.25);
   static const chatGreen = Color.fromARGB(255, 153, 236, 193);
   static const green = Color.fromARGB(255, 36, 109, 71);
-
   static const white = Colors.white;
-
-  // static const green = Color(0xff397E48);
 }

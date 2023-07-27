@@ -31,21 +31,31 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     final currentEvent = event;
     cartList.add(currentEvent.cartItem);
     dummyData.remove(currentEvent.cartItem);
+
     emit(ProductBlocInitial(cartItem: dummyData));
   }
 
   FutureOr<void> incrementQuantityEvent(
       IncrementQuantityEvent event, Emitter<ProductState> emit) {
-    final currentEvent = event;
-    // cartList.contains(currentEvent.cartItem)
-    cartList.any((item) {
-      final isContain = currentEvent.cartItem.itemName == item.itemName;
-      item.quantity += 1;
-      emit(ProductBlocInitial(cartItem: dummyData));
-      return isContain;
-    });
+    for (var item in cartList) {
+      if (item.itemName == event.cartItem.itemName) {
+        item.quantity += 1;
+
+        emit(ProductBlocInitial(cartItem: dummyData));
+        break;
+      }
+    }
   }
 
   FutureOr<void> decrementQuantityEvent(
-      DecrementQuantityEvent event, Emitter<ProductState> emit) {}
+      DecrementQuantityEvent event, Emitter<ProductState> emit) {
+    for (var item in cartList) {
+      if (item.itemName == event.cartItem.itemName) {
+        item.quantity -= 1;
+
+        emit(ProductBlocInitial(cartItem: dummyData));
+        break;
+      }
+    }
+  }
 }

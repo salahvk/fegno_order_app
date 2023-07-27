@@ -3,8 +3,9 @@ import 'package:fegno_order_app/data/db/mycart.dart';
 import 'package:fegno_order_app/domain/entities/cart_item.dart';
 import 'package:fegno_order_app/presentation/bloc/bloc/product_bloc.dart';
 import 'package:fegno_order_app/presentation/widgets/custom_chatbubble.dart';
-import 'package:fegno_order_app/utilis/color_manager.dart';
-import 'package:fegno_order_app/utilis/style_manager.dart';
+import 'package:fegno_order_app/utilis/grand_total.dart';
+import 'package:fegno_order_app/utilis/manager/color_manager.dart';
+import 'package:fegno_order_app/utilis/manager/style_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -17,17 +18,19 @@ class ProductOrderingPage extends StatefulWidget {
 }
 
 class _ProductOrderingPageState extends State<ProductOrderingPage> {
+  bool isItemAdding = false;
   final ProductBloc productBloc = ProductBloc();
   var cartList = GetIt.I<MyCartList>().myList;
   @override
   Widget build(BuildContext context) {
-    print(cartList);
+    final size = MediaQuery.of(context).size;
     return BlocConsumer<ProductBloc, ProductState>(
       bloc: productBloc,
       listener: (context, state) {},
       builder: (context, state) {
-        print(state);
         if (state is ProductBlocInitial) {
+          final grandTotal = calculateGrandTotal();
+          final coupenLimit = (300 - double.parse(grandTotal));
           return Scaffold(
             appBar: AppBar(
               title: const Text('Product Ordering'),
@@ -55,7 +58,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                           style: getRegularStyle(
                               color: ColorManager.mainTextColor, fontSize: 16)),
                       Text(
-                          '\$21.98', // Replace this with the actual calculated grand total
+                          '\$$grandTotal', // Replace this with the actual calculated grand total
                           style: getSemiBoldStyle(
                               color: ColorManager.mainTextColor, fontSize: 16)),
                     ],
@@ -85,32 +88,116 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                   const SizedBox(height: 10),
                   _buildAddMoreItemsRow(),
                 ]),
-                CustomChatBubble(isSendByServer: true, widget: [
-                  ListView.separated(
-                    separatorBuilder: (context, index) {
-                      return const Divider();
-                    },
-                    itemCount: state.cartItem?.length ?? 0,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          productBloc.add(AddItemEvent(state.cartItem![index]));
-                        },
-                        child: Text(
-                          state.cartItem?[index].itemName ?? '',
-                          textAlign: TextAlign.center,
-                          style: getRegularStyle(
-                              color: ColorManager.mainTextColor, fontSize: 14),
+                isItemAdding
+                    ? CustomChatBubble(isSendByServer: true, widget: [
+                        ListView.separated(
+                          separatorBuilder: (context, index) {
+                            return const Divider();
+                          },
+                          itemCount: state.cartItem?.length ?? 0,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {
+                                productBloc
+                                    .add(AddItemEvent(state.cartItem![index]));
+                                isItemAdding = false;
+                              },
+                              child: Text(
+                                state.cartItem?[index].itemName ?? '',
+                                textAlign: TextAlign.center,
+                                style: getRegularStyle(
+                                    color: ColorManager.mainTextColor,
+                                    fontSize: 14),
+                              ),
+                            );
+                          },
+                        )
+                      ])
+                    : Container(),
+                coupenLimit > 0
+                    ? CustomChatBubble(isSendByServer: true, widget: [
+                        RichText(
+                          text: TextSpan(
+                            style: getRegularStyle(
+                                color: ColorManager.mainTextColor,
+                                fontSize: 14),
+                            children: [
+                              const TextSpan(text: 'Add product Worth  '),
+                              TextSpan(
+                                text: coupenLimit.toString(),
+                                style: getBoldStyle(
+                                    color: ColorManager.mainTextColor,
+                                    fontSize: 16),
+                              ),
+                              const TextSpan(text: '  to available coupon'),
+                            ],
+                          ),
                         ),
-                      );
-                    },
-                  )
-                ]),
-                const CustomChatBubble(
-                    isSendByServer: true,
-                    widget: [Text("Add product Worth 15 to available coupen")])
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: SizedBox(
+                            width: size.width,
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: const Text("Procceed"),
+                            ),
+                          ),
+                        ),
+                      ])
+                    : CustomChatBubble(isSendByServer: true, widget: [
+                        Container(
+                          height: 80,
+                          decoration: BoxDecoration(
+                              color: ColorManager.secondary,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                const Icon(Icons.view_carousel_sharp),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      ' 5 Unused coupens',
+                                      style: getBoldStyle(
+                                          color: ColorManager.mainTextColor,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      'Apply one and get discount',
+                                      style: getRegularStyle(
+                                          color: ColorManager.mainTextColor,
+                                          fontSize: 12),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: SizedBox(
+                            width: size.width,
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: const Text("Continue Without applying"),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: size.width,
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: ColorManager.chatGreen),
+                              onPressed: () {},
+                              child: const Text("Apply Coupen")),
+                        )
+                      ])
               ],
             ),
           );
@@ -188,19 +275,28 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
   }
 
   Widget _buildAddMoreItemsRow() {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'Add more items',
-          style: TextStyle(
-            color: Colors.blue,
-            fontWeight: FontWeight.bold,
-          ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        splashColor: ColorManager.green.withOpacity(.2),
+        onTap: () => setState(() {
+          isItemAdding = true;
+        }),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Add items',
+              style: TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(width: 5),
+            Icon(Icons.add, color: Colors.blue),
+          ],
         ),
-        SizedBox(width: 5),
-        Icon(Icons.add, color: Colors.blue),
-      ],
+      ),
     );
   }
 }
