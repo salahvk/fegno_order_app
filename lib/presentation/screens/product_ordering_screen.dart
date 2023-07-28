@@ -3,6 +3,7 @@ import 'package:fegno_order_app/data/db/mycart.dart';
 import 'package:fegno_order_app/domain/entities/cart_item.dart';
 import 'package:fegno_order_app/presentation/bloc/bloc/product_bloc.dart';
 import 'package:fegno_order_app/presentation/widgets/custom_chatbubble.dart';
+import 'package:fegno_order_app/presentation/widgets/custom_diologue.dart';
 import 'package:fegno_order_app/utilis/grand_total.dart';
 import 'package:fegno_order_app/utilis/manager/color_manager.dart';
 import 'package:fegno_order_app/utilis/manager/style_manager.dart';
@@ -147,35 +148,46 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                         ),
                       ])
                     : CustomChatBubble(isSendByServer: true, widget: [
-                        Container(
-                          height: 80,
-                          decoration: BoxDecoration(
-                              color: ColorManager.secondary,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                const Icon(Icons.view_carousel_sharp),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' 5 Unused coupens',
-                                      style: getBoldStyle(
-                                          color: ColorManager.mainTextColor,
-                                          fontSize: 16),
-                                    ),
-                                    Text(
-                                      'Apply one and get discount',
-                                      style: getRegularStyle(
-                                          color: ColorManager.mainTextColor,
-                                          fontSize: 12),
-                                    )
-                                  ],
-                                )
-                              ],
+                        InkWell(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return MainDialog();
+                              },
+                            );
+                          },
+                          child: Container(
+                            height: 80,
+                            decoration: BoxDecoration(
+                                color: ColorManager.secondary,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  const Icon(Icons.view_carousel_sharp),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        ' 5 Unused coupens',
+                                        style: getBoldStyle(
+                                            color: ColorManager.mainTextColor,
+                                            fontSize: 16),
+                                      ),
+                                      Text(
+                                        'Apply one and get discount',
+                                        style: getRegularStyle(
+                                            color: ColorManager.mainTextColor,
+                                            fontSize: 12),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),
