@@ -41,13 +41,16 @@ class MainDialog extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Center(
                         child: InkWell(
-                          onTap: () {
+                          onTap: () async {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return const CoupenApplied();
                               },
                             );
+                            await Future.delayed(const Duration(seconds: 3));
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
                           },
                           child: Container(
                             decoration: BoxDecoration(

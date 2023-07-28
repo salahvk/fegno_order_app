@@ -1,3 +1,5 @@
+import 'package:fegno_order_app/utilis/manager/color_manager.dart';
+import 'package:fegno_order_app/utilis/manager/style_manager.dart';
 import 'package:flutter/material.dart';
 
 class CoupenApplied extends StatelessWidget {
@@ -11,10 +13,10 @@ class CoupenApplied extends StatelessWidget {
       ),
       child: Container(
         padding: const EdgeInsets.all(20.0),
-        child: const Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
@@ -26,16 +28,24 @@ class CoupenApplied extends StatelessWidget {
                 ),
               ],
             ),
-            Icon(Icons.card_giftcard, color: Colors.amber, size: 180.0),
-            SizedBox(height: 10.0),
+            const Icon(Icons.card_giftcard, color: Colors.amber, size: 180.0),
+            const SizedBox(height: 10.0),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(width: 5.0),
+                const SizedBox(width: 5.0),
                 Text(
-                  "Congratulation, you've saved \$9",
-                  style: TextStyle(fontSize: 16.0),
+                  "Congratulation, you've saved",
+                  style: getRegularStyle(
+                      color: ColorManager.mainTextColor, fontSize: 12),
                 ),
               ],
+            ),
+            const SizedBox(height: 10.0),
+            Text(
+              "\$9",
+              style:
+                  getSemiBoldStyle(color: ColorManager.chatGreen, fontSize: 15),
             ),
           ],
         ),

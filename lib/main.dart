@@ -1,4 +1,5 @@
 import 'package:fegno_order_app/data/db/mycart.dart';
+import 'package:fegno_order_app/data/db/mycoupen.dart';
 import 'package:fegno_order_app/presentation/bloc/bloc/product_bloc.dart';
 import 'package:fegno_order_app/presentation/screens/product_ordering_screen.dart';
 import 'package:fegno_order_app/utilis/manager/color_manager.dart';
@@ -34,4 +35,5 @@ class MyApp extends StatelessWidget {
 
 void registerSingletons() {
   GetIt.I.registerLazySingleton<MyCartList>(() => MyCartList());
+  GetIt.I.registerLazySingleton<MyCoupenList>(() => MyCoupenList());
 }
