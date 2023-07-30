@@ -3,7 +3,8 @@ import 'package:fegno_order_app/utilis/manager/style_manager.dart';
 import 'package:flutter/material.dart';
 
 class CoupenApplied extends StatelessWidget {
-  const CoupenApplied({super.key});
+  final double coupenDiscount;
+  const CoupenApplied({super.key, required this.coupenDiscount});
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +44,8 @@ class CoupenApplied extends StatelessWidget {
             ),
             const SizedBox(height: 10.0),
             Text(
-              "\$9",
-              style:
-                  getSemiBoldStyle(color: ColorManager.chatGreen, fontSize: 15),
+              "\$$coupenDiscount",
+              style: getSemiBoldStyle(color: ColorManager.green, fontSize: 15),
             ),
           ],
         ),

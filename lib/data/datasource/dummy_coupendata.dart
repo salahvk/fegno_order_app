@@ -21,8 +21,8 @@ List<Map<String, dynamic>> coupons = [
   },
   {
     'couponCode': 'COUPON5',
-    'discountAmount': 15.0,
-    'applicableAmount': 75.0,
+    'discountAmount': 150.0,
+    'applicableAmount': 600.0,
   },
 ];
 

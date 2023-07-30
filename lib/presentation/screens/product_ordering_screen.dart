@@ -10,6 +10,7 @@ import 'package:fegno_order_app/utilis/manager/style_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:lottie/lottie.dart';
 
 class ProductOrderingPage extends StatefulWidget {
   const ProductOrderingPage({super.key});
@@ -153,7 +154,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
-                                return MainDialog();
+                                return const MainDialog();
                               },
                             );
                           },
@@ -179,7 +180,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                             fontSize: 16),
                                       ),
                                       Text(
-                                        'Apply one and get discount',
+                                        'Place Orderd get discount',
                                         style: getRegularStyle(
                                             color: ColorManager.mainTextColor,
                                             fontSize: 12),
@@ -207,9 +208,230 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: ColorManager.chatGreen),
                               onPressed: () {},
-                              child: const Text("Apply Coupen")),
+                              child: const Text("Place Order")),
                         )
-                      ])
+                      ]),
+                CustomChatBubble(isSendByServer: false, widget: [
+                  SizedBox(
+                      child: LottieBuilder.asset(
+                    'assets/i_won.json',
+                    height: size.height * .2,
+                    width: size.width * .2,
+                  )),
+                  Text(
+                    "I Won \$20",
+                    style: getRegularStyle(color: ColorManager.mainTextColor),
+                  )
+                ]),
+                CustomChatBubble(isSendByServer: true, widget: [
+                  InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const MainDialog();
+                        },
+                      );
+                    },
+                    child: Container(
+                      height: 80,
+                      decoration: BoxDecoration(
+                          color: ColorManager.secondary,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(
+                              'Select delivery method',
+                              style: getBoldStyle(
+                                  color: ColorManager.mainTextColor,
+                                  fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: SizedBox(
+                      width: size.width,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          productBloc.add(DeliveryMethodSelection(true));
+                        },
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.home),
+                            SizedBox(width: 5),
+                            Text("Home delivery"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: size.width,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          productBloc.add(DeliveryMethodSelection(false));
+                        },
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.bike_scooter),
+                            SizedBox(width: 5),
+                            Text("Take away"),
+                          ],
+                        )),
+                  )
+                ]),
+                state.isHome == null
+                    ? Container()
+                    : state.isHome ?? true
+                        ? CustomChatBubble(isSendByServer: false, widget: [
+                            Text(
+                              'I Prefer Home delivery',
+                              style: getRegularStyle(
+                                  color: ColorManager.mainTextColor,
+                                  fontSize: 14),
+                            ),
+                          ])
+                        : CustomChatBubble(isSendByServer: false, widget: [
+                            Text(
+                              'I Prefer Take away',
+                              style: getRegularStyle(
+                                  color: ColorManager.mainTextColor,
+                                  fontSize: 14),
+                            ),
+                          ]),
+                CustomChatBubble(isSendByServer: true, widget: [
+                  Text(
+                    'Please Select a time slot to collect the prodcuts from our store',
+                    style: getRegularStyle(
+                        color: ColorManager.mainTextColor, fontSize: 14),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Wrap(
+                    alignment: WrapAlignment.spaceAround,
+                    children: List.generate(
+                        5,
+                        (index) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              child: ElevatedButton(
+                                  onPressed: () {},
+                                  child: const Text("9 am to 12 pm")),
+                            )),
+                  ),
+                ]),
+                CustomChatBubble(isSendByServer: true, widget: [
+                  Row(
+                    children: [
+                      Text(
+                        'Bill Details',
+                        style: getBoldStyle(
+                            color: ColorManager.mainTextColor, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Item Total',
+                          style: getSemiBoldStyle(
+                              color: ColorManager.mainTextColor, fontSize: 14),
+                        ),
+                        Text(
+                          '\$20.00',
+                          style: getSemiBoldStyle(
+                              color: ColorManager.mainTextColor, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Coupen discount',
+                        style: getRegularStyle(
+                            color: ColorManager.mainTextColor, fontSize: 14),
+                      ),
+                      Text(
+                        '\$20.00',
+                        style: getSemiBoldStyle(
+                            color: ColorManager.green, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Grand total',
+                          style: getBoldStyle(
+                              color: ColorManager.mainTextColor, fontSize: 16),
+                        ),
+                        Text(
+                          '\$0.00',
+                          style: getBoldStyle(
+                              color: ColorManager.green, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: _buildChangeInfoRow(),
+                  ),
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Add Instructions',
+                          style: getSemiBoldStyle(
+                              color: ColorManager.mainTextColor, fontSize: 14),
+                        ),
+                        const SizedBox(width: 5),
+                        Icon(Icons.add, color: ColorManager.mainTextColor),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: SizedBox(
+                      width: size.width,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        child: const Text("Cancel"),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: size.width,
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorManager.chatGreen),
+                        onPressed: () {},
+                        child: const Text("Place Order")),
+                  ),
+                ]),
               ],
             ),
           );

@@ -1,8 +1,33 @@
+import 'package:fegno_order_app/data/datasource/dummy_coupendata.dart';
+import 'package:fegno_order_app/domain/entities/coupen_model.dart';
 import 'package:fegno_order_app/presentation/widgets/coupen_applied_diologue.dart';
+import 'package:fegno_order_app/utilis/grand_total.dart';
+import 'package:fegno_order_app/utilis/manager/color_manager.dart';
+import 'package:fegno_order_app/utilis/manager/style_manager.dart';
 import 'package:flutter/material.dart';
 
-class MainDialog extends StatelessWidget {
+class MainDialog extends StatefulWidget {
   const MainDialog({super.key});
+
+  @override
+  State<MainDialog> createState() => _MainDialogState();
+}
+
+class _MainDialogState extends State<MainDialog> {
+  List<CouponModel>? dummyCoupenData;
+  String? grandTotal;
+  @override
+  void initState() {
+    super.initState();
+    dummyCoupenData = DummyCoupenData()
+        .getCoupenData()
+        .map((e) => CouponModel(
+            couponModelCode: e['couponCode'],
+            discountAmount: e['discountAmount'],
+            applicableAmount: e['applicableAmount']))
+        .toList();
+    grandTotal = calculateGrandTotal();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +61,8 @@ class MainDialog extends StatelessWidget {
                 height: 200.0,
                 child: GridView.count(
                   crossAxisCount: 3, // Set to 3 for maximum 3 items in a row
-                  children: List.generate(5, (index) {
+                  children:
+                      List.generate(dummyCoupenData?.length ?? 0, (index) {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Center(
@@ -45,7 +71,10 @@ class MainDialog extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
-                                return const CoupenApplied();
+                                return CoupenApplied(
+                                  coupenDiscount:
+                                      dummyCoupenData![index].discountAmount,
+                                );
                               },
                             );
                             await Future.delayed(const Duration(seconds: 3));
@@ -58,7 +87,20 @@ class MainDialog extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(10)),
                             height: 80.0,
                             width: 80.0,
-                            child: const Icon(Icons.card_giftcard, size: 50.0),
+                            child: Column(
+                              children: [
+                                double.parse(grandTotal ?? '0') >=
+                                        dummyCoupenData![index].applicableAmount
+                                    ? const Icon(Icons.card_giftcard,
+                                        size: 50.0)
+                                    : const Icon(Icons.close, size: 50.0),
+                                Text(
+                                  dummyCoupenData?[index].couponModelCode ?? '',
+                                  style: getRegularStyle(
+                                      color: ColorManager.mainTextColor),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),

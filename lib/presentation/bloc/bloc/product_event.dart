@@ -22,3 +22,9 @@ class DecrementQuantityEvent extends ProductEvent {
 
   DecrementQuantityEvent(this.cartItem);
 }
+
+class DeliveryMethodSelection extends ProductEvent {
+  final bool isHome;
+
+  DeliveryMethodSelection(this.isHome);
+}

@@ -25,6 +25,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<AddItemEvent>(addItemEvent);
     on<IncrementQuantityEvent>(incrementQuantityEvent);
     on<DecrementQuantityEvent>(decrementQuantityEvent);
+    on<DeliveryMethodSelection>(deliveryMethodSelection);
   }
 
   FutureOr<void> addItemEvent(AddItemEvent event, Emitter<ProductState> emit) {
@@ -57,5 +58,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         break;
       }
     }
+  }
+
+  FutureOr<void> deliveryMethodSelection(
+      DeliveryMethodSelection event, Emitter<ProductState> emit) {
+    emit(ProductBlocInitial(cartItem: dummyData, isHome: event.isHome));
   }
 }

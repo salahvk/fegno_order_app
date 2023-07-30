@@ -4,9 +4,9 @@ abstract class ProductState {}
 
 class ProductBlocInitial extends ProductState {
   List<CartItemModel>? cartItem;
-  bool? isCoupenAvailable;
+  bool? isHome;
 
-  ProductBlocInitial({this.cartItem, this.isCoupenAvailable});
+  ProductBlocInitial({this.cartItem, this.isHome});
 }
 
 class ProductItemAdded extends ProductState {
