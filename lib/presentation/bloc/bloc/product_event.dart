@@ -28,3 +28,15 @@ class DeliveryMethodSelection extends ProductEvent {
 
   DeliveryMethodSelection(this.isHome);
 }
+
+class CoupenRedeem extends ProductEvent {
+  final CouponModel couponModel;
+
+  CoupenRedeem(this.couponModel);
+}
+
+class TimeSlotSelected extends ProductEvent {
+  final TimeSlot timeSlot;
+
+  TimeSlotSelected(this.timeSlot);
+}

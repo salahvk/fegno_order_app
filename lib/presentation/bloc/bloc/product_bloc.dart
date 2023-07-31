@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:fegno_order_app/data/datasource/dummy_cartdata.dart';
+import 'package:fegno_order_app/data/datasource/dummy_timeslots.dart';
 import 'package:fegno_order_app/data/db/mycart.dart';
 import 'package:fegno_order_app/domain/entities/cart_item.dart';
+import 'package:fegno_order_app/domain/entities/coupen_model.dart';
+import 'package:fegno_order_app/domain/entities/time_slot_model.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
 
@@ -21,11 +24,17 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           quantityUnit: e['quantityUnit'],
           imageUrl: e['imageUrl']))
       .toList();
+  static final timeSlots = DummyTimeSlots()
+      .getTimeSlots()
+      .map((e) => TimeSlot(timeslot: e['timeslot']))
+      .toList();
   ProductBloc() : super(ProductBlocInitial(cartItem: dummyData)) {
     on<AddItemEvent>(addItemEvent);
     on<IncrementQuantityEvent>(incrementQuantityEvent);
     on<DecrementQuantityEvent>(decrementQuantityEvent);
     on<DeliveryMethodSelection>(deliveryMethodSelection);
+    on<CoupenRedeem>(coupenRedeem);
+    on<TimeSlotSelected>(timeSlotSelected);
   }
 
   FutureOr<void> addItemEvent(AddItemEvent event, Emitter<ProductState> emit) {
@@ -62,6 +71,24 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   FutureOr<void> deliveryMethodSelection(
       DeliveryMethodSelection event, Emitter<ProductState> emit) {
-    emit(ProductBlocInitial(cartItem: dummyData, isHome: event.isHome));
+    emit(ProductBlocInitial(
+        cartItem: dummyData, isHome: event.isHome, timeSlot: timeSlots));
+  }
+
+  FutureOr<void> coupenRedeem(CoupenRedeem event, Emitter<ProductState> emit) {
+    emit(ProductBlocInitial(
+        cartItem: dummyData, couponModel: event.couponModel));
+  }
+
+  FutureOr<void> timeSlotSelected(
+      TimeSlotSelected event, Emitter<ProductState> emit) {
+    final prevState = state;
+    if (prevState is ProductBlocInitial) {
+      emit(ProductBlocInitial(
+          cartItem: dummyData,
+          isHome: prevState.isHome,
+          timeSlot: timeSlots,
+          selectedTimeSlot: event.timeSlot));
+    }
   }
 }

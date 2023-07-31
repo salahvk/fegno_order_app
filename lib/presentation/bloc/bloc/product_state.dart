@@ -5,8 +5,16 @@ abstract class ProductState {}
 class ProductBlocInitial extends ProductState {
   List<CartItemModel>? cartItem;
   bool? isHome;
+  CouponModel? couponModel;
+  List<TimeSlot>? timeSlot;
+  TimeSlot? selectedTimeSlot;
 
-  ProductBlocInitial({this.cartItem, this.isHome});
+  ProductBlocInitial(
+      {this.cartItem,
+      this.isHome,
+      this.couponModel,
+      this.timeSlot,
+      this.selectedTimeSlot});
 }
 
 class ProductItemAdded extends ProductState {

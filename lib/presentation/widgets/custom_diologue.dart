@@ -1,5 +1,6 @@
 import 'package:fegno_order_app/data/datasource/dummy_coupendata.dart';
 import 'package:fegno_order_app/domain/entities/coupen_model.dart';
+import 'package:fegno_order_app/presentation/bloc/bloc/product_bloc.dart';
 import 'package:fegno_order_app/presentation/widgets/coupen_applied_diologue.dart';
 import 'package:fegno_order_app/utilis/grand_total.dart';
 import 'package:fegno_order_app/utilis/manager/color_manager.dart';
@@ -7,7 +8,8 @@ import 'package:fegno_order_app/utilis/manager/style_manager.dart';
 import 'package:flutter/material.dart';
 
 class MainDialog extends StatefulWidget {
-  const MainDialog({super.key});
+  final ProductBloc productBloc;
+  const MainDialog({super.key, required this.productBloc});
 
   @override
   State<MainDialog> createState() => _MainDialogState();
@@ -78,8 +80,8 @@ class _MainDialogState extends State<MainDialog> {
                               },
                             );
                             await Future.delayed(const Duration(seconds: 3));
-                            Navigator.of(context)
-                                .popUntil((route) => route.isFirst);
+                            widget.productBloc
+                                .add(CoupenRedeem(dummyCoupenData![index]));
                           },
                           child: Container(
                             decoration: BoxDecoration(
