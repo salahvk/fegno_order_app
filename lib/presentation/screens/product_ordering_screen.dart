@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fegno_order_app/data/db/mycart.dart';
 import 'package:fegno_order_app/domain/entities/cart_item.dart';
 import 'package:fegno_order_app/presentation/bloc/bloc/product_bloc.dart';
+import 'package:fegno_order_app/presentation/screens/payment_success_screen.dart';
 import 'package:fegno_order_app/presentation/widgets/custom_chatbubble.dart';
 import 'package:fegno_order_app/presentation/widgets/custom_diologue.dart';
 import 'package:fegno_order_app/utilis/grand_total.dart';
@@ -35,6 +36,12 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
       listener: (context, state) {
         if (state is ProductBlocInitial && state.couponModel != null) {
           Navigator.of(context).popUntil((route) => route.isFirst);
+        } else if (state is PaymentSuccess) {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return const PaymentSuccessPage();
+            },
+          ));
         }
       },
       builder: (context, state) {
@@ -459,7 +466,9 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: ColorManager.chatGreen),
-                              onPressed: () {},
+                              onPressed: () {
+                                productBloc.add(PlaceOrder());
+                              },
                               child: const Text("Place Order")),
                         ),
                       ])
@@ -467,7 +476,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                 Padding(
                   padding:
                       const EdgeInsets.only(top: 10, bottom: 10, right: 25),
-                  child: !isProceed
+                  child: !isProceed && coupenLimit > 0
                       ? SizedBox(
                           width: size.width,
                           child: ElevatedButton(
@@ -480,8 +489,9 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                     const SizedBox(
                                       height: 50,
                                       child: CustomSnackBar.error(
-                                        icon: Icon(Icons.people),
+                                        icon: Icon(Icons.card_giftcard),
                                         iconPositionLeft: 20,
+                                        iconRotationAngle: 0,
                                         iconPositionTop: -25,
                                         message: "Add a product",
                                       ),
@@ -495,25 +505,29 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                             child: const Text("Proceed"),
                           ),
                         )
-                      : Container(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: SizedBox(
-                    width: size.width,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text("Continue Without applying"),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: size.width,
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorManager.chatGreen),
-                      onPressed: () {},
-                      child: const Text("Apply Coupen")),
+                      : state.couponModel != null
+                          ? Column(
+                              children: [
+                                SizedBox(
+                                  width: size.width,
+                                  child: ElevatedButton(
+                                    onPressed: () {},
+                                    child:
+                                        const Text("Continue Without applying"),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: size.width,
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              ColorManager.chatGreen),
+                                      onPressed: () {},
+                                      child: const Text("Apply Coupen")),
+                                )
+                              ],
+                            )
+                          : Container(),
                 )
               ].reversed.toList(),
             ),

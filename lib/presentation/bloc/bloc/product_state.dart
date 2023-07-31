@@ -22,3 +22,5 @@ class ProductItemAdded extends ProductState {
 
   ProductItemAdded(this.cartItem);
 }
+
+class PaymentSuccess extends ProductState {}

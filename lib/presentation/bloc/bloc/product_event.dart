@@ -40,3 +40,9 @@ class TimeSlotSelected extends ProductEvent {
 
   TimeSlotSelected(this.timeSlot);
 }
+
+class PlaceOrder extends ProductEvent {
+  // final TimeSlot timeSlot;
+
+  // TimeSlotSelected(this.timeSlot);
+}

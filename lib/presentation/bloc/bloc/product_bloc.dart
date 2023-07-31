@@ -35,6 +35,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<DeliveryMethodSelection>(deliveryMethodSelection);
     on<CoupenRedeem>(coupenRedeem);
     on<TimeSlotSelected>(timeSlotSelected);
+    on<PlaceOrder>(placeOrder);
   }
 
   FutureOr<void> addItemEvent(AddItemEvent event, Emitter<ProductState> emit) {
@@ -91,5 +92,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           selectedTimeSlot: event.timeSlot,
           couponModel: prevState.couponModel));
     }
+  }
+
+  FutureOr<void> placeOrder(PlaceOrder event, Emitter<ProductState> emit) {
+    emit(PaymentSuccess());
   }
 }
