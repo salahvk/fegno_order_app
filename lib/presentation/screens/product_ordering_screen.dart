@@ -197,24 +197,6 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: SizedBox(
-                            width: size.width,
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              child: const Text("Continue Without applying"),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: size.width,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: ColorManager.chatGreen),
-                              onPressed: () {},
-                              child: const Text("Place Order")),
-                        )
                       ]),
                 state.couponModel != null
                     ? CustomChatBubble(isSendByServer: false, widget: [
@@ -515,6 +497,24 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                         )
                       : Container(),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: SizedBox(
+                    width: size.width,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: const Text("Continue Without applying"),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: size.width,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorManager.chatGreen),
+                      onPressed: () {},
+                      child: const Text("Apply Coupen")),
+                )
               ].reversed.toList(),
             ),
           );
