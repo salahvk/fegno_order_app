@@ -60,7 +60,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   FutureOr<void> decrementQuantityEvent(
       DecrementQuantityEvent event, Emitter<ProductState> emit) {
     for (var item in cartList) {
-      if (item.itemName == event.cartItem.itemName) {
+      if (item.itemName == event.cartItem.itemName && item.quantity != 0) {
         item.quantity -= 1;
 
         emit(ProductBlocInitial(cartItem: dummyData));
@@ -88,7 +88,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           cartItem: dummyData,
           isHome: prevState.isHome,
           timeSlot: timeSlots,
-          selectedTimeSlot: event.timeSlot));
+          selectedTimeSlot: event.timeSlot,
+          couponModel: prevState.couponModel));
     }
   }
 }

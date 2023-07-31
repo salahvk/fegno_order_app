@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lottie/lottie.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ProductOrderingPage extends StatefulWidget {
   const ProductOrderingPage({super.key});
@@ -385,7 +387,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                     fontSize: 14),
                               ),
                               Text(
-                                '\$20.00',
+                                '\$$grandTotal',
                                 style: getSemiBoldStyle(
                                     color: ColorManager.mainTextColor,
                                     fontSize: 14),
@@ -402,11 +404,19 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                   color: ColorManager.mainTextColor,
                                   fontSize: 14),
                             ),
-                            Text(
-                              '\$20.00',
-                              style: getSemiBoldStyle(
-                                  color: ColorManager.green, fontSize: 14),
-                            ),
+                            state.couponModel != null
+                                ? Text(
+                                    '\$${state.couponModel?.discountAmount}',
+                                    style: getSemiBoldStyle(
+                                        color: ColorManager.green,
+                                        fontSize: 14),
+                                  )
+                                : Text(
+                                    '\$0.00',
+                                    style: getSemiBoldStyle(
+                                        color: ColorManager.green,
+                                        fontSize: 14),
+                                  ),
                           ],
                         ),
                         const Divider(),
@@ -422,7 +432,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                     fontSize: 16),
                               ),
                               Text(
-                                '\$0.00',
+                                '\$${double.parse(grandTotal) + (state.couponModel?.discountAmount ?? 0)}',
                                 style: getBoldStyle(
                                     color: ColorManager.green, fontSize: 16),
                               ),
@@ -479,10 +489,26 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                       ? SizedBox(
                           width: size.width,
                           child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorManager.chatGreen),
                             onPressed: () {
-                              setState(() {
-                                isProceed = true;
-                              });
+                              if (double.parse(grandTotal) < 1) {
+                                showTopSnackBar(
+                                    Overlay.of(context),
+                                    const SizedBox(
+                                      height: 50,
+                                      child: CustomSnackBar.error(
+                                        icon: Icon(Icons.people),
+                                        iconPositionLeft: 20,
+                                        iconPositionTop: -25,
+                                        message: "Add a product",
+                                      ),
+                                    ));
+                              } else {
+                                setState(() {
+                                  isProceed = true;
+                                });
+                              }
                             },
                             child: const Text("Proceed"),
                           ),
