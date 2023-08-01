@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fegno_order_app/controllers/text_controllers.dart';
 import 'package:fegno_order_app/data/db/mycart.dart';
 import 'package:fegno_order_app/domain/entities/cart_item.dart';
 import 'package:fegno_order_app/presentation/bloc/bloc/product_bloc.dart';
@@ -26,6 +27,8 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
   bool isItemAdding = false;
   bool isProceed = true;
   bool isConWithoutCoupen = false;
+  bool isinsButtonEnable = false;
+  bool isinsShared = false;
   final ProductBloc productBloc = ProductBloc();
   var cartList = GetIt.I<MyCartList>().myList;
 
@@ -265,13 +268,18 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                         color: ColorManager.mainTextColor,
                                         fontSize: 14),
                                   ),
-                                  InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          state.isHome = null;
-                                        });
-                                      },
-                                      child: const Icon(Icons.edit))
+                                  state.selectedTimeSlot == null
+                                      ? InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              state.isHome = null;
+                                            });
+                                          },
+                                          child: const Icon(Icons.edit))
+                                      : const Icon(
+                                          Icons.edit,
+                                          color: Colors.grey,
+                                        )
                                 ],
                               ),
                             ),
@@ -289,13 +297,18 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                         color: ColorManager.mainTextColor,
                                         fontSize: 14),
                                   ),
-                                  InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          state.isHome = null;
-                                        });
-                                      },
-                                      child: const Icon(Icons.edit))
+                                  state.selectedTimeSlot == null
+                                      ? InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              state.isHome = null;
+                                            });
+                                          },
+                                          child: const Icon(Icons.edit))
+                                      : const Icon(
+                                          Icons.edit,
+                                          color: Colors.grey,
+                                        )
                                 ],
                               ),
                             ),
@@ -437,23 +450,33 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                           child: _buildChangeInfoRow(),
                         ),
                         const Divider(),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Add Instructions',
-                                style: getSemiBoldStyle(
-                                    color: ColorManager.mainTextColor,
-                                    fontSize: 14),
+                        isinsButtonEnable
+                            ? Container()
+                            : InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isinsButtonEnable = true;
+                                  });
+                                },
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Add Instructions',
+                                        style: getSemiBoldStyle(
+                                            color: ColorManager.mainTextColor,
+                                            fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Icon(Icons.add,
+                                          color: ColorManager.mainTextColor),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              const SizedBox(width: 5),
-                              Icon(Icons.add,
-                                  color: ColorManager.mainTextColor),
-                            ],
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: SizedBox(
@@ -480,6 +503,28 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                     : Container(),
 
                 // Button case
+                isinsShared
+                    ? CustomChatBubble(isSendByServer: false, widget: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              ProductControllers.instructionController.text,
+                              style: getRegularStyle(
+                                  color: ColorManager.mainTextColor,
+                                  fontSize: 14),
+                            ),
+                            InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    state.selectedTimeSlot = null;
+                                  });
+                                },
+                                child: const Icon(Icons.edit))
+                          ],
+                        ),
+                      ])
+                    : Container(),
                 Padding(
                   padding: const EdgeInsets.only(top: 0, bottom: 0, right: 25),
                   child: isProceed && coupenLimit > 0
@@ -599,113 +644,52 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                 )
                               : Container(),
                 ),
-
-                // Padding(
-                //   padding: const EdgeInsets.only(top: 0, bottom: 10, right: 25),
-                //   child: !isProceed && coupenLimit > 0
-                //       ? SizedBox(
-                //           width: size.width,
-                //           child: ElevatedButton(
-                //             style: ElevatedButton.styleFrom(
-                //                 backgroundColor: ColorManager.chatGreen),
-                //             onPressed: () {
-                //               if (double.parse(grandTotal) < 1) {
-                //                 showTopSnackBar(
-                //                     Overlay.of(context),
-                //                     const SizedBox(
-                //                       height: 50,
-                //                       child: CustomSnackBar.error(
-                //                         icon: Icon(Icons.card_giftcard),
-                //                         iconPositionLeft: 20,
-                //                         iconRotationAngle: 0,
-                //                         iconPositionTop: -25,
-                //                         message: "Add a product",
-                //                       ),
-                //                     ));
-                //               } else {
-                //                 setState(() {
-                //                   isProceed = true;
-                //                 });
-                //               }
-                //             },
-                //             child: const Text("Proceed"),
-                //           ),
-                //         )
-                //       : state.couponModel != null
-                //           ? Column(
-                //               children: [
-                //                 SizedBox(
-                //                   width: size.width,
-                //                   child: ElevatedButton(
-                //                     onPressed: () {},
-                //                     child:
-                //                         const Text("Continue Without applying"),
-                //                   ),
-                //                 ),
-                //                 SizedBox(
-                //                   width: size.width,
-                //                   child: ElevatedButton(
-                //                       style: ElevatedButton.styleFrom(
-                //                           backgroundColor:
-                //                               ColorManager.chatGreen),
-                //                       onPressed: () {},
-                //                       child: const Text("Apply Coupen")),
-                //                 )
-                //               ],
-                //             )
-                //           : state.isHome == null && coupenLimit < 0
-                //               ? Padding(
-                //                   padding: const EdgeInsets.only(
-                //                       top: 0, bottom: 10, right: 25),
-                // child:
-                // Column(
-                //   children: [
-                //     Padding(
-                //       padding: const EdgeInsets.symmetric(
-                //           vertical: 0),
-                //       child: SizedBox(
-                //         width: size.width,
-                //         child: ElevatedButton(
-                //           onPressed: () {
-                //             productBloc.add(
-                //                 DeliveryMethodSelection(
-                //                     true));
-                //           },
-                //           child: const Row(
-                //             mainAxisAlignment:
-                //                 MainAxisAlignment.center,
-                //             children: [
-                //               Icon(Icons.home),
-                //               SizedBox(width: 5),
-                //               Text("Home delivery"),
-                //             ],
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //     SizedBox(
-                //       width: size.width,
-                //       child: ElevatedButton(
-                //           onPressed: () {
-                //             productBloc.add(
-                //                 DeliveryMethodSelection(
-                //                     false));
-                //           },
-                //           child: const Row(
-                //             mainAxisAlignment:
-                //                 MainAxisAlignment.center,
-                //             children: [
-                //               Icon(Icons.bike_scooter),
-                //               SizedBox(width: 5),
-                //               Text("Take away"),
-                //             ],
-                //           )),
-                //     )
-                //   ],
-                // ),
-                //                 )
-                //               : Container(),
-                // ),
+                isinsButtonEnable && !isinsShared
+                    ? Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: ColorManager.secondary,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller:
+                                    ProductControllers.instructionController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Add your instruction',
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  isinsShared = true;
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors
+                                        .black, // Set the border color here
+                                    width: 1.0, // Set the border width here
+                                  ),
+                                ),
+                                child: const CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: ColorManager.chatGreen,
+                                  child: Icon(Icons.send),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    : Container()
               ].reversed.toList(),
             ),
           );
