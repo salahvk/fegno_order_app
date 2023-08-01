@@ -517,11 +517,21 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                             InkWell(
                                 onTap: () {
                                   setState(() {
-                                    state.selectedTimeSlot = null;
+                                    isinsButtonEnable = true;
+                                    isinsShared = false;
                                   });
                                 },
                                 child: const Icon(Icons.edit))
                           ],
+                        ),
+                      ])
+                    : Container(),
+                isinsShared
+                    ? CustomChatBubble(isSendByServer: true, widget: [
+                        Text(
+                          'Your instruction has been shared to the shop owner',
+                          style: getRegularStyle(
+                              color: ColorManager.mainTextColor, fontSize: 14),
                         ),
                       ])
                     : Container(),
