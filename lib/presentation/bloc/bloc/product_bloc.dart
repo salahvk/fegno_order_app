@@ -15,7 +15,7 @@ part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   static var cartList = GetIt.I<MyCartList>().myList;
-  static final dummyData = DummyDataSource()
+  static List<CartItemModel> dummyData = DummyDataSource()
       .getCartItems()
       .map((e) => CartItemModel(
           itemName: e['itemName'],
@@ -36,6 +36,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<CoupenRedeem>(coupenRedeem);
     on<TimeSlotSelected>(timeSlotSelected);
     on<PlaceOrder>(placeOrder);
+    on<ContinueShopping>(continueShopping);
+    on<CancelPurchase>(cancelPurchase);
   }
 
   FutureOr<void> addItemEvent(AddItemEvent event, Emitter<ProductState> emit) {
@@ -72,8 +74,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   FutureOr<void> deliveryMethodSelection(
       DeliveryMethodSelection event, Emitter<ProductState> emit) {
-    emit(ProductBlocInitial(
-        cartItem: dummyData, isHome: event.isHome, timeSlot: timeSlots));
+    final prevState = state;
+    if (prevState is ProductBlocInitial) {
+      emit(ProductBlocInitial(
+          cartItem: dummyData,
+          isHome: event.isHome,
+          timeSlot: timeSlots,
+          couponModel: prevState.couponModel));
+    }
   }
 
   FutureOr<void> coupenRedeem(CoupenRedeem event, Emitter<ProductState> emit) {
@@ -96,5 +104,25 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   FutureOr<void> placeOrder(PlaceOrder event, Emitter<ProductState> emit) {
     emit(PaymentSuccess());
+  }
+
+  FutureOr<void> continueShopping(
+      ContinueShopping event, Emitter<ProductState> emit) {
+    cartList.clear();
+    dummyData = DummyDataSource()
+        .getCartItems()
+        .map((e) => CartItemModel(
+            itemName: e['itemName'],
+            price: e['price'].toDouble(),
+            quantity: (e['quantity']),
+            quantityUnit: e['quantityUnit'],
+            imageUrl: e['imageUrl']))
+        .toList();
+    emit(ProductBlocInitial(cartItem: dummyData, ispaymentSuccess: true));
+  }
+
+  FutureOr<void> cancelPurchase(
+      CancelPurchase event, Emitter<ProductState> emit) {
+    emit(ProductBlocInitial(cartItem: dummyData));
   }
 }

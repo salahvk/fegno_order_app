@@ -1,3 +1,4 @@
+import 'package:fegno_order_app/presentation/bloc/bloc/product_bloc.dart';
 import 'package:fegno_order_app/utilis/manager/assets_manager.dart';
 import 'package:fegno_order_app/utilis/manager/color_manager.dart';
 import 'package:fegno_order_app/utilis/manager/style_manager.dart';
@@ -13,7 +14,9 @@ import 'package:lottie/lottie.dart';
 import 'package:screenshot/screenshot.dart';
 
 class PaymentSuccessPage extends StatefulWidget {
-  const PaymentSuccessPage({Key? key}) : super(key: key);
+  final ProductBloc productBloc;
+  const PaymentSuccessPage({Key? key, required this.productBloc})
+      : super(key: key);
 
   @override
   State<PaymentSuccessPage> createState() => _PaymentSuccessPageState();
@@ -72,7 +75,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                                     )),
                               ))
                           : SizedBox(
-                              // height: 280,
+                              height: 280,
                               child: Stack(
                                 alignment: AlignmentDirectional.center,
                                 children: [
@@ -114,7 +117,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                         height: 30,
                       ),
                       ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            widget.productBloc.add(ContinueShopping());
+                          },
                           child: const Text("Continue Shopping")),
                       const SizedBox(
                         height: 30,

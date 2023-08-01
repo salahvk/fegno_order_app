@@ -41,8 +41,8 @@ class TimeSlotSelected extends ProductEvent {
   TimeSlotSelected(this.timeSlot);
 }
 
-class PlaceOrder extends ProductEvent {
-  // final TimeSlot timeSlot;
+class PlaceOrder extends ProductEvent {}
 
-  // TimeSlotSelected(this.timeSlot);
-}
+class ContinueShopping extends ProductEvent {}
+
+class CancelPurchase extends ProductEvent {}

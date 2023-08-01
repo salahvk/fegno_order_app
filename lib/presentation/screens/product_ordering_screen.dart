@@ -24,7 +24,8 @@ class ProductOrderingPage extends StatefulWidget {
 
 class _ProductOrderingPageState extends State<ProductOrderingPage> {
   bool isItemAdding = false;
-  bool isProceed = false;
+  bool isProceed = true;
+  bool isConWithoutCoupen = false;
   final ProductBloc productBloc = ProductBloc();
   var cartList = GetIt.I<MyCartList>().myList;
 
@@ -39,7 +40,17 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
         } else if (state is PaymentSuccess) {
           Navigator.push(context, MaterialPageRoute(
             builder: (context) {
-              return const PaymentSuccessPage();
+              return PaymentSuccessPage(
+                productBloc: productBloc,
+              );
+            },
+          ));
+        } else if (state is ProductBlocInitial &&
+            state.ispaymentSuccess == true) {
+          Navigator.pop(context);
+          Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) {
+              return const ProductOrderingPage();
             },
           ));
         }
@@ -49,7 +60,10 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
           final grandTotal = calculateGrandTotal();
           final coupenLimit = (300 - double.parse(grandTotal));
           return Scaffold(
+            backgroundColor: ColorManager.background,
             appBar: AppBar(
+              backgroundColor: ColorManager.background,
+              centerTitle: true,
               title: Text(
                 'Product Ordering',
                 style: getSemiBoldStyle(
@@ -159,48 +173,35 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                         ),
                       ])
                     : CustomChatBubble(isSendByServer: true, widget: [
-                        InkWell(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return MainDialog(
-                                  productBloc: productBloc,
-                                );
-                              },
-                            );
-                          },
-                          child: Container(
-                            height: 80,
-                            decoration: BoxDecoration(
-                                color: ColorManager.secondary,
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  const Icon(Icons.view_carousel_sharp),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        ' 5 Unused coupens',
-                                        style: getBoldStyle(
-                                            color: ColorManager.mainTextColor,
-                                            fontSize: 16),
-                                      ),
-                                      Text(
-                                        'Place Orderd get discount',
-                                        style: getRegularStyle(
-                                            color: ColorManager.mainTextColor,
-                                            fontSize: 12),
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
+                        Container(
+                          height: 80,
+                          decoration: BoxDecoration(
+                              color: ColorManager.secondary,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                const Icon(Icons.view_carousel_sharp),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      ' 5 Unused coupens',
+                                      style: getBoldStyle(
+                                          color: ColorManager.mainTextColor,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      'Place Orderd get discount',
+                                      style: getRegularStyle(
+                                          color: ColorManager.mainTextColor,
+                                          fontSize: 12),
+                                    )
+                                  ],
+                                )
+                              ],
                             ),
                           ),
                         ),
@@ -215,24 +216,15 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                         )),
                         Text(
                           "I Won \$${state.couponModel?.discountAmount}",
-                          style: getRegularStyle(
-                              color: ColorManager.mainTextColor),
+                          style: getMediumtStyle(
+                              color: ColorManager.mainTextColor, fontSize: 15),
                         )
                       ])
                     : Container(),
-                state.couponModel != null || isProceed
+                state.couponModel != null || !isProceed || isConWithoutCoupen
                     ? CustomChatBubble(isSendByServer: true, widget: [
                         InkWell(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return MainDialog(
-                                  productBloc: productBloc,
-                                );
-                              },
-                            );
-                          },
+                          onTap: () {},
                           child: Container(
                             height: 80,
                             decoration: BoxDecoration(
@@ -255,59 +247,57 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: SizedBox(
-                            width: size.width,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                productBloc.add(DeliveryMethodSelection(true));
-                              },
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.home),
-                                  SizedBox(width: 5),
-                                  Text("Home delivery"),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: size.width,
-                          child: ElevatedButton(
-                              onPressed: () {
-                                productBloc.add(DeliveryMethodSelection(false));
-                              },
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.bike_scooter),
-                                  SizedBox(width: 5),
-                                  Text("Take away"),
-                                ],
-                              )),
-                        )
                       ])
                     : Container(),
                 state.isHome == null
                     ? Container()
                     : state.isHome ?? true
                         ? CustomChatBubble(isSendByServer: false, widget: [
-                            Text(
-                              'I Prefer Home delivery',
-                              style: getRegularStyle(
-                                  color: ColorManager.mainTextColor,
-                                  fontSize: 14),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'I Prefer Home delivery',
+                                    style: getRegularStyle(
+                                        color: ColorManager.mainTextColor,
+                                        fontSize: 14),
+                                  ),
+                                  InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          state.isHome = null;
+                                        });
+                                      },
+                                      child: const Icon(Icons.edit))
+                                ],
+                              ),
                             ),
                           ])
                         : CustomChatBubble(isSendByServer: false, widget: [
-                            Text(
-                              'I Prefer Take away',
-                              style: getRegularStyle(
-                                  color: ColorManager.mainTextColor,
-                                  fontSize: 14),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'I Prefer Take away',
+                                    style: getRegularStyle(
+                                        color: ColorManager.mainTextColor,
+                                        fontSize: 14),
+                                  ),
+                                  InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          state.isHome = null;
+                                        });
+                                      },
+                                      child: const Icon(Icons.edit))
+                                ],
+                              ),
                             ),
                           ]),
                 state.isHome != null
@@ -345,10 +335,23 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                     : Container(),
                 state.selectedTimeSlot != null
                     ? CustomChatBubble(isSendByServer: false, widget: [
-                        Text(
-                          state.selectedTimeSlot?.timeslot ?? '',
-                          style: getRegularStyle(
-                              color: ColorManager.mainTextColor, fontSize: 14),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              state.selectedTimeSlot?.timeslot ?? '',
+                              style: getRegularStyle(
+                                  color: ColorManager.mainTextColor,
+                                  fontSize: 14),
+                            ),
+                            InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    state.selectedTimeSlot = null;
+                                  });
+                                },
+                                child: const Icon(Icons.edit))
+                          ],
                         ),
                       ])
                     : Container(),
@@ -456,7 +459,9 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                           child: SizedBox(
                             width: size.width,
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                productBloc.add(CancelPurchase());
+                              },
                               child: const Text("Cancel"),
                             ),
                           ),
@@ -473,10 +478,11 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                         ),
                       ])
                     : Container(),
+
+                // Button case
                 Padding(
-                  padding:
-                      const EdgeInsets.only(top: 10, bottom: 10, right: 25),
-                  child: !isProceed && coupenLimit > 0
+                  padding: const EdgeInsets.only(top: 0, bottom: 0, right: 25),
+                  child: isProceed && coupenLimit > 0
                       ? SizedBox(
                           width: size.width,
                           child: ElevatedButton(
@@ -498,20 +504,27 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                     ));
                               } else {
                                 setState(() {
-                                  isProceed = true;
+                                  isProceed = false;
+                                  isItemAdding = false;
                                 });
                               }
                             },
                             child: const Text("Proceed"),
                           ),
                         )
-                      : state.couponModel != null
+                      : coupenLimit <= 0 &&
+                              state.couponModel == null &&
+                              isConWithoutCoupen
                           ? Column(
                               children: [
                                 SizedBox(
                                   width: size.width,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      setState(() {
+                                        isConWithoutCoupen = true;
+                                      });
+                                    },
                                     child:
                                         const Text("Continue Without applying"),
                                   ),
@@ -522,13 +535,177 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                       style: ElevatedButton.styleFrom(
                                           backgroundColor:
                                               ColorManager.chatGreen),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return MainDialog(
+                                              productBloc: productBloc,
+                                            );
+                                          },
+                                        );
+                                      },
                                       child: const Text("Apply Coupen")),
                                 )
                               ],
                             )
-                          : Container(),
-                )
+                          : state.isHome == null || isConWithoutCoupen
+                              ? Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 0),
+                                      child: SizedBox(
+                                        width: size.width,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            productBloc.add(
+                                                DeliveryMethodSelection(true));
+
+                                            isConWithoutCoupen = false;
+                                          },
+                                          child: const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.home),
+                                              SizedBox(width: 5),
+                                              Text("Home delivery"),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: size.width,
+                                      child: ElevatedButton(
+                                          onPressed: () {
+                                            productBloc.add(
+                                                DeliveryMethodSelection(false));
+
+                                            isConWithoutCoupen = false;
+                                          },
+                                          child: const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.bike_scooter),
+                                              SizedBox(width: 5),
+                                              Text("Take away"),
+                                            ],
+                                          )),
+                                    )
+                                  ],
+                                )
+                              : Container(),
+                ),
+
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 0, bottom: 10, right: 25),
+                //   child: !isProceed && coupenLimit > 0
+                //       ? SizedBox(
+                //           width: size.width,
+                //           child: ElevatedButton(
+                //             style: ElevatedButton.styleFrom(
+                //                 backgroundColor: ColorManager.chatGreen),
+                //             onPressed: () {
+                //               if (double.parse(grandTotal) < 1) {
+                //                 showTopSnackBar(
+                //                     Overlay.of(context),
+                //                     const SizedBox(
+                //                       height: 50,
+                //                       child: CustomSnackBar.error(
+                //                         icon: Icon(Icons.card_giftcard),
+                //                         iconPositionLeft: 20,
+                //                         iconRotationAngle: 0,
+                //                         iconPositionTop: -25,
+                //                         message: "Add a product",
+                //                       ),
+                //                     ));
+                //               } else {
+                //                 setState(() {
+                //                   isProceed = true;
+                //                 });
+                //               }
+                //             },
+                //             child: const Text("Proceed"),
+                //           ),
+                //         )
+                //       : state.couponModel != null
+                //           ? Column(
+                //               children: [
+                //                 SizedBox(
+                //                   width: size.width,
+                //                   child: ElevatedButton(
+                //                     onPressed: () {},
+                //                     child:
+                //                         const Text("Continue Without applying"),
+                //                   ),
+                //                 ),
+                //                 SizedBox(
+                //                   width: size.width,
+                //                   child: ElevatedButton(
+                //                       style: ElevatedButton.styleFrom(
+                //                           backgroundColor:
+                //                               ColorManager.chatGreen),
+                //                       onPressed: () {},
+                //                       child: const Text("Apply Coupen")),
+                //                 )
+                //               ],
+                //             )
+                //           : state.isHome == null && coupenLimit < 0
+                //               ? Padding(
+                //                   padding: const EdgeInsets.only(
+                //                       top: 0, bottom: 10, right: 25),
+                // child:
+                // Column(
+                //   children: [
+                //     Padding(
+                //       padding: const EdgeInsets.symmetric(
+                //           vertical: 0),
+                //       child: SizedBox(
+                //         width: size.width,
+                //         child: ElevatedButton(
+                //           onPressed: () {
+                //             productBloc.add(
+                //                 DeliveryMethodSelection(
+                //                     true));
+                //           },
+                //           child: const Row(
+                //             mainAxisAlignment:
+                //                 MainAxisAlignment.center,
+                //             children: [
+                //               Icon(Icons.home),
+                //               SizedBox(width: 5),
+                //               Text("Home delivery"),
+                //             ],
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //     SizedBox(
+                //       width: size.width,
+                //       child: ElevatedButton(
+                //           onPressed: () {
+                //             productBloc.add(
+                //                 DeliveryMethodSelection(
+                //                     false));
+                //           },
+                //           child: const Row(
+                //             mainAxisAlignment:
+                //                 MainAxisAlignment.center,
+                //             children: [
+                //               Icon(Icons.bike_scooter),
+                //               SizedBox(width: 5),
+                //               Text("Take away"),
+                //             ],
+                //           )),
+                //     )
+                //   ],
+                // ),
+                //                 )
+                //               : Container(),
+                // ),
               ].reversed.toList(),
             ),
           );

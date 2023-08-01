@@ -71,14 +71,14 @@ class _MainDialogState extends State<MainDialog> {
                         child: InkWell(
                           onTap: () async {
                             showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return CoupenApplied(
-                                  coupenDiscount:
-                                      dummyCoupenData![index].discountAmount,
-                                );
-                              },
-                            );
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return CoupenApplied(
+                                    coupenDiscount:
+                                        dummyCoupenData![index].discountAmount,
+                                  );
+                                },
+                                barrierDismissible: false);
                             await Future.delayed(const Duration(seconds: 3));
                             widget.productBloc
                                 .add(CoupenRedeem(dummyCoupenData![index]));
