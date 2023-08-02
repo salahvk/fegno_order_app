@@ -645,6 +645,10 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                                 productBloc
                                                     .add(CancelPurchase());
                                                 isinsButtonEnable = false;
+                                                isinsShared = false;
+                                                ProductControllers
+                                                    .instructionController
+                                                    .clear();
                                               },
                                               child: const Text("Cancel"),
                                             ),
