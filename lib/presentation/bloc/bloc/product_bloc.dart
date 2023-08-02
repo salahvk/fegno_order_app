@@ -103,7 +103,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   }
 
   FutureOr<void> placeOrder(PlaceOrder event, Emitter<ProductState> emit) {
-    emit(PaymentSuccess());
+    emit(PaymentSuccess(
+        coupenDiscount: event.coupenDiscount,
+        grandTotal: event.grandTotal,
+        itemTotal: event.itemTotal));
   }
 
   FutureOr<void> continueShopping(

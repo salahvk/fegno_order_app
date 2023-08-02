@@ -25,4 +25,13 @@ class ProductItemAdded extends ProductState {
   ProductItemAdded(this.cartItem);
 }
 
-class PaymentSuccess extends ProductState {}
+class PaymentSuccess extends ProductState {
+  final String itemTotal;
+  final String coupenDiscount;
+  final String grandTotal;
+
+  PaymentSuccess(
+      {required this.itemTotal,
+      required this.coupenDiscount,
+      required this.grandTotal});
+}

@@ -4,6 +4,7 @@ import 'package:fegno_order_app/utilis/manager/color_manager.dart';
 import 'package:fegno_order_app/utilis/manager/style_manager.dart';
 import 'package:fegno_order_app/utilis/pdfApi.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:google_nav_bar/google_nav_bar.dart';
@@ -47,91 +48,162 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: ColorManager.green,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Screenshot(
-                  controller: screenshotController,
+    return BlocBuilder<ProductBloc, ProductState>(
+      bloc: widget.productBloc,
+      builder: (context, state) {
+        if (state is PaymentSuccess) {
+          return Scaffold(
+            backgroundColor: ColorManager.green,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Center(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      isProgress
-                          ? const SizedBox(
-                              height: 280,
-                              width: 280,
-                              child: Center(
-                                child: SizedBox(
-                                    height: 90,
-                                    width: 90,
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: ColorManager.primary,
-                                      color: ColorManager.white,
-                                      strokeWidth: 5,
-                                    )),
-                              ))
-                          : SizedBox(
-                              height: 280,
-                              child: Stack(
-                                alignment: AlignmentDirectional.center,
-                                children: [
-                                  LottieBuilder.asset(
-                                    ImageAssets.paymentSuccess,
-                                    repeat: false,
+                      Screenshot(
+                        controller: screenshotController,
+                        child: Column(
+                          children: [
+                            isProgress
+                                ? const SizedBox(
+                                    height: 280,
+                                    width: 280,
+                                    child: Center(
+                                      child: SizedBox(
+                                          height: 90,
+                                          width: 90,
+                                          child: CircularProgressIndicator(
+                                            backgroundColor:
+                                                ColorManager.primary,
+                                            color: ColorManager.white,
+                                            strokeWidth: 5,
+                                          )),
+                                    ))
+                                : SizedBox(
+                                    height: 400,
+                                    child: Stack(
+                                      alignment: AlignmentDirectional.center,
+                                      children: [
+                                        LottieBuilder.asset(
+                                          ImageAssets.paymentSuccess,
+                                          repeat: false,
+                                        ),
+                                        Positioned(
+                                            bottom: 20,
+                                            // left: 2,
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Item Total :",
+                                                      style: getSemiBoldStyle(
+                                                          color: ColorManager
+                                                              .mainTextColor,
+                                                          fontSize: 20),
+                                                    ),
+                                                    Text(
+                                                      state.itemTotal,
+                                                      style: getSemiBoldStyle(
+                                                          color: ColorManager
+                                                              .mainTextColor,
+                                                          fontSize: 20),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Coupen Discount :",
+                                                      style: getSemiBoldStyle(
+                                                          color: ColorManager
+                                                              .mainTextColor,
+                                                          fontSize: 20),
+                                                    ),
+                                                    Text(
+                                                      state.coupenDiscount,
+                                                      style: getSemiBoldStyle(
+                                                          color: ColorManager
+                                                              .mainTextColor,
+                                                          fontSize: 20),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const Divider(),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Grand Total :",
+                                                      style: getBoldStyle(
+                                                          color: ColorManager
+                                                              .mainTextColor,
+                                                          fontSize: 20),
+                                                    ),
+                                                    Text(
+                                                      state.grandTotal,
+                                                      style: getBoldStyle(
+                                                          color: ColorManager
+                                                              .mainTextColor,
+                                                          fontSize: 20),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            )),
+                                      ],
+                                    ),
                                   ),
-                                  const Positioned(
-                                      bottom: 20,
-                                      // left: 2,
-                                      child: Column(
-                                        children: [
-                                          // Text(
-                                          //   "Transaction no : #123456789",
-                                          //   style: getRegularStyle(
-                                          //       color: ColorManager
-                                          //           .paymentPageColor1,
-                                          //       fontSize: 16),
-                                          // ),
-                                        ],
-                                      )),
-                                ],
-                              ),
+                            Text(
+                              'Your order has been \nPlaced successfully',
+                              textAlign: TextAlign.center,
+                              style: getRegularStyle(
+                                  color: ColorManager.mainTextColor,
+                                  fontSize: 16),
                             ),
-                      Text(
-                        'Your order has been \nPlaced successfully',
-                        textAlign: TextAlign.center,
-                        style: getRegularStyle(
-                            color: ColorManager.chatGreen, fontSize: 16),
+                            // Text(
+                            //   str.su_title_1,
+                            //   textAlign: TextAlign.center,
+                            //   style: getRegularStyle(
+                            //       color: ColorManager.paymentPageColor1,
+                            //       fontSize: 16),
+                            // ),
+                            const SizedBox(
+                              height: 30,
+                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  widget.productBloc.add(ContinueShopping());
+                                },
+                                child: const Text("Continue Shopping")),
+                            const SizedBox(
+                              height: 30,
+                            ),
+                          ],
+                        ),
                       ),
-                      // Text(
-                      //   str.su_title_1,
-                      //   textAlign: TextAlign.center,
-                      //   style: getRegularStyle(
-                      //       color: ColorManager.paymentPageColor1,
-                      //       fontSize: 16),
-                      // ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      ElevatedButton(
-                          onPressed: () {
-                            widget.productBloc.add(ContinueShopping());
-                          },
-                          child: const Text("Continue Shopping")),
-                      const SizedBox(
-                        height: 30,
+                      SizedBox(
+                        width: 200,
+                        child: ElevatedButton(
+                            onPressed: () {
+                              generatePdf();
+                            },
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text("Generate Pdf"),
+                                Icon(Icons.picture_as_pdf)
+                              ],
+                            )),
                       ),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
+          );
+        }
+        return Container();
+      },
     );
   }
 

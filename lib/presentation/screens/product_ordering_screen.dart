@@ -26,7 +26,7 @@ class ProductOrderingPage extends StatefulWidget {
 class _ProductOrderingPageState extends State<ProductOrderingPage> {
   bool isItemAdding = false;
   bool isProceed = true;
-  bool isConWithoutCoupen = false;
+  String continueButtonState = '1';
   bool isinsButtonEnable = false;
   bool isinsShared = false;
   final ProductBloc productBloc = ProductBloc();
@@ -224,7 +224,9 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                         )
                       ])
                     : Container(),
-                state.couponModel != null || !isProceed || isConWithoutCoupen
+                state.couponModel != null ||
+                        !isProceed ||
+                        continueButtonState == '2'
                     ? CustomChatBubble(isSendByServer: true, widget: [
                         InkWell(
                           onTap: () {},
@@ -437,7 +439,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                     fontSize: 16),
                               ),
                               Text(
-                                '\$${double.parse(grandTotal) + (state.couponModel?.discountAmount ?? 0)}',
+                                '\$${double.parse(grandTotal) - (state.couponModel?.discountAmount ?? 0)}',
                                 style: getBoldStyle(
                                     color: ColorManager.green, fontSize: 16),
                               ),
@@ -477,28 +479,6 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                   ),
                                 ),
                               ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: SizedBox(
-                            width: size.width,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                productBloc.add(CancelPurchase());
-                              },
-                              child: const Text("Cancel"),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: size.width,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: ColorManager.chatGreen),
-                              onPressed: () {
-                                productBloc.add(PlaceOrder());
-                              },
-                              child: const Text("Place Order")),
-                        ),
                       ])
                     : Container(),
 
@@ -569,7 +549,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                         )
                       : coupenLimit <= 0 &&
                               state.couponModel == null &&
-                              isConWithoutCoupen
+                              continueButtonState == '1'
                           ? Column(
                               children: [
                                 SizedBox(
@@ -577,7 +557,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       setState(() {
-                                        isConWithoutCoupen = true;
+                                        continueButtonState = '2';
                                       });
                                     },
                                     child:
@@ -604,7 +584,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                 )
                               ],
                             )
-                          : state.isHome == null || isConWithoutCoupen
+                          : state.isHome == null || continueButtonState == '2'
                               ? Column(
                                   children: [
                                     Padding(
@@ -616,8 +596,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                           onPressed: () {
                                             productBloc.add(
                                                 DeliveryMethodSelection(true));
-
-                                            isConWithoutCoupen = false;
+                                            continueButtonState = '3';
                                           },
                                           child: const Row(
                                             mainAxisAlignment:
@@ -637,8 +616,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                           onPressed: () {
                                             productBloc.add(
                                                 DeliveryMethodSelection(false));
-
-                                            isConWithoutCoupen = false;
+                                            continueButtonState = '3';
                                           },
                                           child: const Row(
                                             mainAxisAlignment:
@@ -652,8 +630,49 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                     )
                                   ],
                                 )
-                              : Container(),
+                              : state.selectedTimeSlot != null
+                                  ? Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 0),
+                                          child: SizedBox(
+                                            width: size.width,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                productBloc
+                                                    .add(CancelPurchase());
+                                                isinsButtonEnable = false;
+                                              },
+                                              child: const Text("Cancel"),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: size.width,
+                                          child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      ColorManager.chatGreen),
+                                              onPressed: () {
+                                                productBloc.add(PlaceOrder(
+                                                    coupenDiscount:
+                                                        '\$${state.couponModel?.discountAmount}',
+                                                    grandTotal: '\$$grandTotal',
+                                                    itemTotal:
+                                                        '\$${double.parse(grandTotal) - (state.couponModel?.discountAmount ?? 0)}'));
+                                              },
+                                              child: const Text("Place Order")),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        )
+                                      ],
+                                    )
+                                  : Container(),
                 ),
+
+                // Add instruction
                 isinsButtonEnable && !isinsShared
                     ? Container(
                         padding: const EdgeInsets.all(10),
