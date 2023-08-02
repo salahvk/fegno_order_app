@@ -315,7 +315,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                               ),
                             ),
                           ]),
-                state.isHome != null
+                state.isHome != null && state.isHome == false
                     ? CustomChatBubble(isSendByServer: true, widget: [
                         Text(
                           'Please Select a time slot to collect the prodcuts from our store',
@@ -348,7 +348,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                             : Container(),
                       ])
                     : Container(),
-                state.selectedTimeSlot != null
+                state.selectedTimeSlot != null && state.isHome == false
                     ? CustomChatBubble(isSendByServer: false, widget: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -370,7 +370,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                         ),
                       ])
                     : Container(),
-                state.selectedTimeSlot != null
+                state.selectedTimeSlot != null || state.isHome == true
                     ? CustomChatBubble(isSendByServer: true, widget: [
                         Row(
                           children: [
@@ -596,6 +596,7 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                           onPressed: () {
                                             productBloc.add(
                                                 DeliveryMethodSelection(true));
+
                                             continueButtonState = '3';
                                           },
                                           child: const Row(
