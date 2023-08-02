@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="fegno_order_app"
+        android:label="Product order app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
