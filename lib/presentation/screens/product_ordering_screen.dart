@@ -631,7 +631,8 @@ class _ProductOrderingPageState extends State<ProductOrderingPage> {
                                     )
                                   ],
                                 )
-                              : state.selectedTimeSlot != null
+                              : state.selectedTimeSlot != null ||
+                                      state.isHome == true
                                   ? Column(
                                       children: [
                                         Padding(
